@@ -1,0 +1,7 @@
+.snakemake
+downloads
+experiments
+logs
+samples
+basecall
+profile
