@@ -33,7 +33,10 @@ CUSTOM_MODELS : {
   'exp1' : ['sup', 'm5C_2OmeC', 'inosine_m6A_2OmeA']
 }
 
-# Sample data
+# Sample data. The barcode column is optional but sample_id, experiment_id and
+# kit are required. If multiple samples share the same experiment_id, they will
+# be demultiplexed by barcode. If no barcode is provided for a sample, it is
+# assumed that the experiment is not multiplexed.
 SAMPLE_DATA: {
   'header': ['sample_id', 'experiment_id', 'kit', 'barcode'],
   'data': [

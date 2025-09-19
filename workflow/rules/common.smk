@@ -41,9 +41,11 @@ class experiment:
         return False
 
 
-# Create a pandas dataframe from SAMPLE_DATA in config.yml
-df_samples = pd.DataFrame(SAMPLE_DATA['data'],
-                          columns=SAMPLE_DATA['header'])
+# Create a pandas dataframe from SAMPLE_DATA in config.yml. Use None for empty
+# values.
+records = [dict(zip(SAMPLE_DATA['header'], row)) for row in SAMPLE_DATA['data']]
+df_samples = pd.DataFrame.from_records(records, columns=SAMPLE_DATA['header'])
+df_samples = df_samples.astype(object).where(pd.notna(df_samples), None)
 
 
 # Create a dictionary with samples and experiments.
