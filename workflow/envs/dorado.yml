@@ -1,0 +1,9 @@
+name: dorado
+channels:
+  - nanoporetech
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - nanoporetech::pychopper
+  - samtools>=1.21

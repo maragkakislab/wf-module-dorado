@@ -1,0 +1,39 @@
+#### load config ####
+if "--configfile" in sys.argv:
+    i = sys.argv.index("--configfile")
+    config_path = sys.argv[i + 1]
+    configfile: config_path
+else:
+    config_path = "config/config.yml"
+    configfile: config_path
+
+
+#### set variables from config ####
+DOWNLOADS_DIR = config['DOWNLOADS_DIR']
+EXP_DIR = config['EXP_DIR']
+EXP_DIR_TRIGGER_FILE = config.get('EXP_DIR_TRIGGER_FILE', 'origin.txt')
+BASECALL_DIR = config['BASECALL_DIR']
+SAMPLES_DIR = config['SAMPLES_DIR']
+UNSTRANDED_KITS = config.get('UNSTRANDED_KITS', [])
+BIN_VERSION = config['BIN_VERSION']
+DEFAULT_MODEL = config['DEFAULT_MODEL']
+CUSTOM_MODELS = config.get('CUSTOM_MODELS', {})
+SAMPLE_DATA = config['SAMPLE_DATA']
+
+
+##### include rules #####
+include: "rules/common.smk"
+include: "rules/dorado.smk"
+
+
+# Rule run_all collects all outputs to force execution of the whole pipeline.
+localrules: run_all
+rule run_all:
+    input:
+        # Basecalled BAM files
+        expand(SAMPLES_DIR + "/{s}/basecall/calls.bam",
+            s=samples.keys()),
+        # Basecalled and stranded (if requested) FASTQ files
+        expand(SAMPLES_DIR + "/{s}/fastq/reads.final.fastq.gz",
+            s=samples.keys()),
+        

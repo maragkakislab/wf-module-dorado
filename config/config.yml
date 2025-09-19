@@ -1,0 +1,48 @@
+# Directories used in workflow.
+DOWNLOADS_DIR: "downloads" # Dir where the dorado binary will be downloaded to
+
+# Input:
+# The EXP_DIR directory must have one subdirectory per experiment. Each
+# experiment subdirectory should contain POD5 files and an EXP_DIR_TRIGGER_FILE
+# file. The EXP_DIR_TRIGGER_FILE file acts as the workflow entry point; updating
+# it will trigger a re-run for that experiment. POD5 files are searched
+# recursively within each experiment directory.
+EXP_DIR: "experiments"
+EXP_DIR_TRIGGER_FILE: "origin.txt"
+
+# Output:
+BASECALL_DIR: "basecall" # Output dir with basecalled files per experiment
+SAMPLES_DIR: "samples" # Output dir with basecalled files per individual sample
+
+# List of ONT kits that are unstranded (e.g., cDNA kits). For these kits,
+# pychopper is used to strand the reads, and the basecaller runs with --no-trim
+# to keep adaptors needed by pychopper. The final FASTQ will be stranded and
+# adaptors trimmed. To disable this behavior, delete or set UNSTRANDED_KITS to
+# an empty list (UNSTRANDED_KITS: []).
+UNSTRANDED_KITS: ['SQK-PCB111-24', 'SQK-PCS111']
+
+# Dorado version to use. Will be automatically downloaded.
+BIN_VERSION: 'dorado-1.1.1-linux-x64'
+
+# Default model to use for basecalling e.g. 'hac', 'sup', 'fast'
+DEFAULT_MODEL: 'hac'
+    
+# Mapping to specify custom models for experiment
+# e.g. 'sup', 'm5C_2OmeC', 'inosine_m6A_2OmeA', 'pseU_2OmeU', '2OmeG'
+CUSTOM_MODELS : {
+  'exp1' : ['sup', 'm5C_2OmeC', 'inosine_m6A_2OmeA']
+}
+
+# Sample data. The barcode column is optional but sample_id, experiment_id and
+# kit are required. If multiple samples share the same experiment_id, they will
+# be demultiplexed by barcode. If no barcode is provided for a sample, it is
+# assumed that the experiment is not multiplexed.
+SAMPLE_DATA: {
+  'header': ['sample_id', 'experiment_id', 'kit', 'barcode'],
+  'data': [
+    ['sample1', 'exp1', 'SQK-RNA004'],
+    ['sample2', 'exp2', 'SQK-LSK114'],
+    ['sample3_1', 'exp3', 'SQK-PCB111-24', '01'],
+    ['sample3_2', 'exp3', 'SQK-PCB111-24', '02'],
+  ],
+}
