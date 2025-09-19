@@ -3,11 +3,12 @@ DOWNLOADS_DIR: "downloads" # Dir where the dorado binary will be downloaded to
 
 # Input:
 # The EXP_DIR directory must have one subdirectory per experiment. Each
-# experiment subdirectory should contain POD5 files and an origin.txt file. The
-# origin.txt file acts as the workflow entry point; updating it will trigger a
-# re-run for that experiment. POD5 files are searched recursively within each
-# experiment directory.
+# experiment subdirectory should contain POD5 files and an EXP_DIR_TRIGGER_FILE
+# file. The EXP_DIR_TRIGGER_FILE file acts as the workflow entry point; updating
+# it will trigger a re-run for that experiment. POD5 files are searched
+# recursively within each experiment directory.
 EXP_DIR: "experiments"
+EXP_DIR_TRIGGER_FILE: "origin.txt"
 
 # Output:
 BASECALL_DIR: "basecall" # Output dir with basecalled files per experiment

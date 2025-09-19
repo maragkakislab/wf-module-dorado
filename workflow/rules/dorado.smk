@@ -37,11 +37,10 @@ def model(experiment):
 rule basecall:
     input:
         dorado = DOWNLOADS_DIR + '/' + BIN_VERSION + '/bin/dorado',
-        origin = EXP_DIR + "/{e}/origin.txt",
+        origin = EXP_DIR + "/{e}/" + EXP_DIR_TRIGGER_FILE,
     output:
         BASECALL_DIR + "/{e}/calls.bam"
     params:
-        #idir = subpath(input.origin, parent=True),
         idir = lambda wilds, input: os.path.dirname(input.origin),
         model = lambda wilds: model(experiments[wilds.e]),
         extra_opts = lambda wilds: extra_options(experiments[wilds.e]),
