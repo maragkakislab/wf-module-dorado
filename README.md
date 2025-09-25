@@ -20,6 +20,13 @@ independently):
 - Snakemake (>=6 recommended)
 - A GPU-equipped machine for Dorado basecalling.
 
+These rules require minimal resources and can be speficied as localrules
+
+```python
+localrules: run_all, rename_final_stranded_fastq, get_dorado, demux_get_bam,
+            pychopper_merge_trimmed_rescued, get_basecalled_bam_for_sample
+```
+
 ## How to use in other workflows
 
 In the consuming workflow add a section in the config that includes all required

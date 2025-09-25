@@ -1,5 +1,4 @@
 # Rule get_dorado downloads and extracts the specified version of dorado.
-localrules: get_dorado
 rule get_dorado:
     output: 
         tgz = temp(DOWNLOADS_DIR + '/{version}.tar.gz'),
@@ -91,7 +90,6 @@ rule demux:
 # It describes that the output file names have {kit} and {barcode} wildcards.
 # When a file with these wildcards is requested, Snakemake triggers demux
 # to create all files in the demux directory.
-localrules: demux_get_bam
 rule demux_get_bam:
     input:
         BASECALL_DIR + "/{e}/demux_tmp/",
@@ -219,7 +217,6 @@ def path_to_stranded_fastq(sample):
 
 # publish_final_stranded_fastq simply selects the pychopped or non-pychopped (if
 # already stranded) fastq file and moves it to destination.
-localrules: rename_final_stranded_fastq
 rule rename_final_stranded_fastq:
     input:
         lambda ws: path_to_stranded_fastq(samples[ws.sample])
