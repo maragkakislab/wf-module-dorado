@@ -22,7 +22,7 @@ def extra_options(experiment):
         additional_options.append('--kit-name ' + experiment.kit)
     
     # disable adaptor detection (used to orient reads in pychopper)
-    if experiment.is_unstranded():
+    if not experiment.is_stranded():
         additional_options.append('--no-trim')
 
     return " ".join(additional_options),
@@ -204,13 +204,12 @@ rule pychopper_merge_trimmed_rescued:
         """
 
 
-# pychopper_path_to_stranded_fastq identifies and returns the proper
-# stranded fastq file depending on whether PCR-cDNA (pychopper had to run) or
-# dRNA-seq was run.
-def pychopper_path_to_stranded_fastq(sample):
+# path_to_stranded_fastq identifies and returns the proper stranded fastq file
+# depending on whether PCR-cDNA (pychopper had to run) or dRNA-seq was run.
+def path_to_stranded_fastq(sample):
     s = sample
 
-    if s.is_unstranded():
+    if not s.is_stranded():
         return os.path.join(
             SAMPLES_DIR, s.name, "fastq", "reads.pychopped.fastq.gz")
 
@@ -218,13 +217,12 @@ def pychopper_path_to_stranded_fastq(sample):
         SAMPLES_DIR, s.name, "fastq", "reads.fastq.gz")
 
 
-# rename_final_stranded_fastq simply selects the pychopped or
-# non-pychopped (if already stranded) fastq file and copies it to the
-# destination.
+# publish_final_stranded_fastq simply selects the pychopped or non-pychopped (if
+# already stranded) fastq file and moves it to destination.
 localrules: rename_final_stranded_fastq
 rule rename_final_stranded_fastq:
     input:
-        lambda ws: pychopper_path_to_stranded_fastq(samples[ws.sample])
+        lambda ws: path_to_stranded_fastq(samples[ws.sample])
     output:
         SAMPLES_DIR + "/{sample}/fastq/reads.final.fastq.gz"
     shell:
