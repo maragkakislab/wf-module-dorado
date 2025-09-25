@@ -19,6 +19,7 @@ BIN_VERSION = config['BIN_VERSION']
 DEFAULT_MODEL = config['DEFAULT_MODEL']
 CUSTOM_MODELS = config.get('CUSTOM_MODELS', {})
 SAMPLE_DATA = config['SAMPLE_DATA']
+DORADO_RESOURCES = config.get('DORADO_RESOURCES', {})
 
 
 ##### include rules #####

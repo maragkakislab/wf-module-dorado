@@ -41,6 +41,10 @@ DORADO: {
   BASECALL_DIR: "basecall",
   SAMPLES_DIR: "samples",
   BIN_VERSION: 'dorado-1.1.1-linux-x64',
+  DORADO_RESOURCES: {
+    gpu: 2,
+    gpu_model: "[gpua100|gpuv100x]",
+  },
   DEFAULT_MODEL: 'hac',
   SAMPLE_DATA: {
     'header': ['sample_id', 'experiment_id', 'kit', 'stranded', 'barcode'],
@@ -82,6 +86,7 @@ Important keys found in `config/config.yml` (examples):
 - `BASECALL_DIR` - where per-experiment basecalling outputs are stored.
 - `SAMPLES_DIR` - where per-sample outputs are placed.
 - `BIN_VERSION` - Dorado binary version to use.
+- `DORADO_RESOURCES` - Dorado default GPU resources (Optional)
 - `DEFAULT_MODEL`, `CUSTOM_MODELS` - model selection used in `basecall` rule.
 - `SAMPLE_DATA` - table describing samples; the `workflow/rules/common.smk`
     code parses this into `samples` and `experiments` objects. The structure is:

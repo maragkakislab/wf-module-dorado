@@ -3,6 +3,9 @@ rule get_dorado:
     output: 
         tgz = temp(DOWNLOADS_DIR + '/{version}.tar.gz'),
         dorado = DOWNLOADS_DIR + '/{version}/bin/dorado',
+    resources:
+        mem_mb = 2*1024,
+        runtime = 1*60,
     shell:
         """
         curl -L -o {output.tgz} https://cdn.oxfordnanoportal.com/software/analysis/{wildcards.version}.tar.gz
@@ -46,10 +49,10 @@ rule basecall:
     threads:
         8
     resources:
-        gpu = 2,
-        gpu_model = "[gpua100|gpuv100x]",
+        gpu = DORADO_RESOURCES.get("gpu", 1),
+        gpu_model = DORADO_RESOURCES.get("gpu_model", "gpua100"),
         mem_mb = 64*1024,
-        runtime = 8*24*60
+        runtime = 8*24*60,
     shell:
         """
         {input.dorado} basecaller \
@@ -74,7 +77,7 @@ rule demux:
         12
     resources:
         mem_mb = 64*1024,
-        runtime = 4*24*60
+        runtime = 4*24*60,
     shell:
         """
         {input.dorado} demux \
@@ -95,6 +98,9 @@ rule demux_get_bam:
         BASECALL_DIR + "/{e}/demux_tmp/",
     output:
         BASECALL_DIR + "/{e}/demux/{kit}_barcode{b}.bam",
+    resources:
+        mem_mb = 128,
+        runtime = 60,
     shell:
         """
         mv {input}/*_{wildcards.kit}_barcode{wildcards.b}.bam {output}
@@ -122,8 +128,8 @@ rule get_basecalled_bam_for_sample:
     input: bam_from_basecalling
     output: SAMPLES_DIR + "/{s}/basecall/calls.bam"
     resources:
-        mem_mb = 1*1024,
-        runtime = 1*60,
+        mem_mb = 128,
+        runtime = 60,
     threads: 1
     shell:
         """
@@ -138,7 +144,7 @@ rule get_fastq_from_basecalled_bam_for_sample:
     output: temp(SAMPLES_DIR + "/{s}/fastq/reads.fastq.gz")
     resources:
         mem_mb = 6*1024,
-        runtime = 4*24*60
+        runtime = 4*24*60,
     threads: 10
     conda:
         "../envs/dorado.yml"
@@ -166,7 +172,7 @@ rule pychopper_trim_orient_reads:
     resources:
         mem_mb = 20*1024,
         runtime = 3*24*60,
-        disk_mb = 20*1024
+        disk_mb = 20*1024,
     conda:
         "../envs/dorado.yml"
     shell:
@@ -195,7 +201,7 @@ rule pychopper_merge_trimmed_rescued:
     threads: 2
     resources:
         mem_mb = 2*1024,
-        runtime = 24*60
+        runtime = 6*60,
     shell:
         """
         cat {input.trimmed} {input.rescued} > {output}
@@ -222,7 +228,23 @@ rule rename_final_stranded_fastq:
         lambda ws: path_to_stranded_fastq(samples[ws.sample])
     output:
         SAMPLES_DIR + "/{sample}/fastq/reads.final.fastq.gz"
+    resources:
+        mem_mb = 128,
+        runtime = 60,
     shell:
         """
         mv {input} {output}
+        """
+
+rule test:
+    output:
+        "foo.txt"
+    threads:
+        8
+    resources:
+        gpu = DORADO_RESOURCES.get("gpu", 1),
+        gpu_model = DORADO_RESOURCES.get("gpu_model", "gpua100"),
+    shell:
+        """
+        echo {resources.gpu} {resources.gpu_model}
         """
