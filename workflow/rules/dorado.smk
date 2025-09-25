@@ -1,9 +1,11 @@
 # Rule get_dorado downloads and extracts the specified version of dorado.
-localrules: get_dorado
 rule get_dorado:
     output: 
         tgz = temp(DOWNLOADS_DIR + '/{version}.tar.gz'),
         dorado = DOWNLOADS_DIR + '/{version}/bin/dorado',
+    resources:
+        mem_mb = 2*1024,
+        runtime = 1*60,
     shell:
         """
         curl -L -o {output.tgz} https://cdn.oxfordnanoportal.com/software/analysis/{wildcards.version}.tar.gz
@@ -22,7 +24,7 @@ def extra_options(experiment):
         additional_options.append('--kit-name ' + experiment.kit)
     
     # disable adaptor detection (used to orient reads in pychopper)
-    if experiment.is_unstranded():
+    if not experiment.is_stranded():
         additional_options.append('--no-trim')
 
     return " ".join(additional_options),
@@ -47,10 +49,10 @@ rule basecall:
     threads:
         8
     resources:
-        gpu = 2,
-        gpu_model = "[gpua100|gpuv100x]",
+        gpu = DORADO_RESOURCES.get("gpu", 1),
+        gpu_model = DORADO_RESOURCES.get("gpu_model", "gpua100"),
         mem_mb = 64*1024,
-        runtime = 8*24*60
+        runtime = 8*24*60,
     shell:
         """
         {input.dorado} basecaller \
@@ -75,7 +77,7 @@ rule demux:
         12
     resources:
         mem_mb = 64*1024,
-        runtime = 4*24*60
+        runtime = 4*24*60,
     shell:
         """
         {input.dorado} demux \
@@ -91,12 +93,14 @@ rule demux:
 # It describes that the output file names have {kit} and {barcode} wildcards.
 # When a file with these wildcards is requested, Snakemake triggers demux
 # to create all files in the demux directory.
-localrules: demux_get_bam
 rule demux_get_bam:
     input:
         BASECALL_DIR + "/{e}/demux_tmp/",
     output:
         BASECALL_DIR + "/{e}/demux/{kit}_barcode{b}.bam",
+    resources:
+        mem_mb = 128,
+        runtime = 60,
     shell:
         """
         mv {input}/*_{wildcards.kit}_barcode{wildcards.b}.bam {output}
@@ -124,8 +128,8 @@ rule get_basecalled_bam_for_sample:
     input: bam_from_basecalling
     output: SAMPLES_DIR + "/{s}/basecall/calls.bam"
     resources:
-        mem_mb = 1*1024,
-        runtime = 1*60,
+        mem_mb = 128,
+        runtime = 60,
     threads: 1
     shell:
         """
@@ -140,7 +144,7 @@ rule get_fastq_from_basecalled_bam_for_sample:
     output: temp(SAMPLES_DIR + "/{s}/fastq/reads.fastq.gz")
     resources:
         mem_mb = 6*1024,
-        runtime = 4*24*60
+        runtime = 4*24*60,
     threads: 10
     conda:
         "../envs/dorado.yml"
@@ -168,7 +172,7 @@ rule pychopper_trim_orient_reads:
     resources:
         mem_mb = 20*1024,
         runtime = 3*24*60,
-        disk_mb = 20*1024
+        disk_mb = 20*1024,
     conda:
         "../envs/dorado.yml"
     shell:
@@ -197,20 +201,19 @@ rule pychopper_merge_trimmed_rescued:
     threads: 2
     resources:
         mem_mb = 2*1024,
-        runtime = 24*60
+        runtime = 6*60,
     shell:
         """
         cat {input.trimmed} {input.rescued} > {output}
         """
 
 
-# pychopper_path_to_stranded_fastq identifies and returns the proper
-# stranded fastq file depending on whether PCR-cDNA (pychopper had to run) or
-# dRNA-seq was run.
-def pychopper_path_to_stranded_fastq(sample):
+# path_to_stranded_fastq identifies and returns the proper stranded fastq file
+# depending on whether PCR-cDNA (pychopper had to run) or dRNA-seq was run.
+def path_to_stranded_fastq(sample):
     s = sample
 
-    if s.is_unstranded():
+    if not s.is_stranded():
         return os.path.join(
             SAMPLES_DIR, s.name, "fastq", "reads.pychopped.fastq.gz")
 
@@ -218,15 +221,16 @@ def pychopper_path_to_stranded_fastq(sample):
         SAMPLES_DIR, s.name, "fastq", "reads.fastq.gz")
 
 
-# rename_final_stranded_fastq simply selects the pychopped or
-# non-pychopped (if already stranded) fastq file and copies it to the
-# destination.
-localrules: rename_final_stranded_fastq
+# publish_final_stranded_fastq simply selects the pychopped or non-pychopped (if
+# already stranded) fastq file and moves it to destination.
 rule rename_final_stranded_fastq:
     input:
-        lambda ws: pychopper_path_to_stranded_fastq(samples[ws.sample])
+        lambda ws: path_to_stranded_fastq(samples[ws.sample])
     output:
         SAMPLES_DIR + "/{sample}/fastq/reads.final.fastq.gz"
+    resources:
+        mem_mb = 128,
+        runtime = 60,
     shell:
         """
         mv {input} {output}
