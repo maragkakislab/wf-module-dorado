@@ -235,16 +235,3 @@ rule rename_final_stranded_fastq:
         """
         mv {input} {output}
         """
-
-rule test:
-    output:
-        "foo.txt"
-    threads:
-        8
-    resources:
-        gpu = DORADO_RESOURCES.get("gpu", 1),
-        gpu_model = DORADO_RESOURCES.get("gpu_model", "gpua100"),
-    shell:
-        """
-        echo {resources.gpu} {resources.gpu_model}
-        """
