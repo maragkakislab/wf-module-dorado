@@ -99,7 +99,7 @@ rule demux_get_bam:
     output:
         BASECALL_DIR + "/{e}/demux/{kit}_barcode{b}.bam",
     resources:
-        mem_mb = 128,
+        mem_mb = 2 * 1024,
         runtime = 60,
     shell:
         """
@@ -128,7 +128,7 @@ rule get_basecalled_bam_for_sample:
     input: bam_from_basecalling
     output: SAMPLES_DIR + "/{s}/basecall/calls.bam"
     resources:
-        mem_mb = 128,
+        mem_mb = 2 * 1024,
         runtime = 60,
     threads: 1
     shell:
@@ -229,7 +229,7 @@ rule rename_final_stranded_fastq:
     output:
         SAMPLES_DIR + "/{sample}/fastq/reads.final.fastq.gz"
     resources:
-        mem_mb = 128,
+        mem_mb = 2 * 1024,
         runtime = 60,
     shell:
         """
