@@ -60,7 +60,7 @@ Then in a consuming snakefile:
 ```python
 module dorado_basecall:
     snakefile:
-        github("maragkakislab/wf-module-dorado", path="workflow/Snakefile")
+        github("maragkakislab/wf-module-dorado", path="workflow/Snakefile", tag="v1.0.1")
     config:
         config["DORADO"]
 
