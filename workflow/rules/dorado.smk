@@ -41,7 +41,7 @@ rule basecall:
         dorado = DOWNLOADS_DIR + '/' + BIN_VERSION + '/bin/dorado',
         origin = EXP_DIR + "/{e}/" + EXP_DIR_TRIGGER_FILE,
     output:
-        BASECALL_DIR + "/{e}/calls.bam"
+        temp(BASECALL_DIR + "/{e}/calls.bam")
     params:
         idir = lambda wilds, input: os.path.dirname(input.origin),
         model = lambda wilds: model(experiments[wilds.e]),
@@ -227,7 +227,7 @@ rule rename_final_stranded_fastq:
     input:
         lambda ws: path_to_stranded_fastq(samples[ws.sample])
     output:
-        SAMPLES_DIR + "/{sample}/fastq/reads.final.fastq.gz"
+        temp(SAMPLES_DIR + "/{sample}/fastq/reads.final.fastq.gz")
     resources:
         mem_mb = 2 * 1024,
         runtime = 60,
