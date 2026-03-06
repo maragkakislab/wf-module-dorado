@@ -147,7 +147,7 @@ rule get_fastq_from_basecalled_bam_for_sample:
         runtime = 4*24*60,
     threads: 10
     conda:
-        "../envs/dorado.yml"
+        "../envs/samtools.yml"
     shell:
         """
         samtools fastq -T '*' --threads {threads} {input} \
