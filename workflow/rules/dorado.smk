@@ -136,7 +136,6 @@ rule get_basecalled_bam_for_sample:
         ln {input} {output}
         """
 
-
 # Rule get_fastq_from_basecalled_bam_for_sample finds and converts the
 # basecalled bam file corresponding to the requested sample {s} to fastq.
 rule get_fastq_from_basecalled_bam_for_sample:
@@ -220,6 +219,10 @@ def path_to_stranded_fastq(sample):
     return os.path.join(
         SAMPLES_DIR, s.name, "fastq", "reads.fastq.gz")
 
+def maybe_temp(path):
+    if config.get("DELETE_INTERMEDIATES", False):
+        return temp(path)
+    return path
 
 # publish_final_stranded_fastq simply selects the pychopped or non-pychopped (if
 # already stranded) fastq file and moves it to destination.
@@ -227,7 +230,7 @@ rule rename_final_stranded_fastq:
     input:
         lambda ws: path_to_stranded_fastq(samples[ws.sample])
     output:
-        temp(SAMPLES_DIR + "/{sample}/fastq/reads.final.fastq.gz")
+        maybe_temp(SAMPLES_DIR + "/{sample}/fastq/reads.final.fastq.gz")
     resources:
         mem_mb = 2 * 1024,
         runtime = 60,
