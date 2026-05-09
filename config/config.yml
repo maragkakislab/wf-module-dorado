@@ -19,7 +19,7 @@ BIN_VERSION: 'dorado-1.1.1-linux-x64'
 
 # Default model to use for basecalling e.g. 'hac', 'sup', 'fast'
 DEFAULT_MODEL: 'hac'
-
+DELETE_INTERMEDIATES: False
 # Default resource allocation for basecall. This and all other resource
 # allocations for all rules can be overridden in a profile.
 DORADO_RESOURCES:

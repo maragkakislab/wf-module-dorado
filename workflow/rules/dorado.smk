@@ -1,4 +1,9 @@
 # Rule get_dorado downloads and extracts the specified version of dorado.
+def mark_temp(path):
+    if DELETE_INTERMEDIATES:
+        return temp(path)
+    return path
+
 rule get_dorado:
     output: 
         tgz = temp(DOWNLOADS_DIR + '/{version}.tar.gz'),
@@ -41,7 +46,7 @@ rule basecall:
         dorado = DOWNLOADS_DIR + '/' + BIN_VERSION + '/bin/dorado',
         origin = EXP_DIR + "/{e}/" + EXP_DIR_TRIGGER_FILE,
     output:
-        temp(BASECALL_DIR + "/{e}/calls.bam")
+        mark_temp(BASECALL_DIR + "/{e}/calls.bam")
     params:
         idir = lambda wilds, input: os.path.dirname(input.origin),
         model = lambda wilds: model(experiments[wilds.e]),
@@ -72,7 +77,7 @@ rule demux:
         dorado = DOWNLOADS_DIR + '/' + BIN_VERSION + '/bin/dorado',
         calls = BASECALL_DIR + "/{e}/calls.bam"
     output:
-        temp(directory(BASECALL_DIR + "/{e}/demux_tmp/")),
+        mark_temp(directory(BASECALL_DIR + "/{e}/demux_tmp/")),
     threads:
         12
     resources:
@@ -140,7 +145,7 @@ rule get_basecalled_bam_for_sample:
 # basecalled bam file corresponding to the requested sample {s} to fastq.
 rule get_fastq_from_basecalled_bam_for_sample:
     input: bam_from_basecalling
-    output: temp(SAMPLES_DIR + "/{s}/fastq/reads.fastq.gz")
+    output: mark_temp(SAMPLES_DIR + "/{s}/fastq/reads.fastq.gz")
     resources:
         mem_mb = 6*1024,
         runtime = 4*24*60,
@@ -219,10 +224,6 @@ def path_to_stranded_fastq(sample):
     return os.path.join(
         SAMPLES_DIR, s.name, "fastq", "reads.fastq.gz")
 
-def maybe_temp(path):
-    if config.get("DELETE_INTERMEDIATES", False):
-        return temp(path)
-    return path
 
 # publish_final_stranded_fastq simply selects the pychopped or non-pychopped (if
 # already stranded) fastq file and moves it to destination.
@@ -230,7 +231,7 @@ rule rename_final_stranded_fastq:
     input:
         lambda ws: path_to_stranded_fastq(samples[ws.sample])
     output:
-        maybe_temp(SAMPLES_DIR + "/{sample}/fastq/reads.final.fastq.gz")
+        mark_temp(SAMPLES_DIR + "/{sample}/fastq/reads.final.fastq.gz")
     resources:
         mem_mb = 2 * 1024,
         runtime = 60,
