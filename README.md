@@ -60,7 +60,7 @@ Then in a consuming snakefile:
 ```python
 module dorado_basecall:
     snakefile:
-        github("maragkakislab/wf-module-dorado", path="workflow/Snakefile", tag="v1.0.1")
+        github("maragkakislab/wf-module-dorado", path="workflow/Snakefile", tag="v1.0.2")
     config:
         config["DORADO"]
 
@@ -74,7 +74,7 @@ rule run_all:
         SAMPLES_DIR + "/test1/fastq/reads.final.fastq.gz",
 ```
 
-## Configuration (how to edit `config/config.yml`)
+## Configuration
 
 Important keys found in `config/config.yml` (examples):
 
@@ -89,13 +89,6 @@ Important keys found in `config/config.yml` (examples):
 - `DORADO_RESOURCES` - Dorado default GPU resources (Optional)
 - `DEFAULT_MODEL`, `CUSTOM_MODELS` - model selection used in `basecall` rule.
 - `SAMPLE_DATA` - table describing samples; the `workflow/rules/common.smk`
-    code parses this into `samples` and `experiments` objects. The structure is:
-
-    SAMPLE_DATA:
-        header: [sample_id, experiment_id, kit, stranded, barcode]
-        data:
-            - [sample1, exp1, SQK-RNA004]
-            - [sample3_1, exp3, SQK-PCB111-24, 'false', 01]
-
-    If multiple samples share the same `experiment_id` they will be treated as
-    multiplexed and will be demultiplexed by barcode.
+    parses this into `samples` and `experiments` objects. If multiple samples
+    share the same `experiment_id` they are assumed as multiplexed and a unique
+    barcode needs to be provided.
