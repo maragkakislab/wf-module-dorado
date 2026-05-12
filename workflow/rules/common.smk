@@ -5,6 +5,13 @@ import pandas as pd
 from collections import defaultdict
 
 
+# maybe_temp is a helper function that returns a temp path if mark_temp is True, otherwise it returns the original path.
+def maybe_temp(path, mark_temp=False):
+    if mark_temp:
+        return temp(path)
+    return path
+
+
 class sample:
     def __init__(self, name, parent_exp, kit, stranded=True, barcode=None):
         self.name = name
