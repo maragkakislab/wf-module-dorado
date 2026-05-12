@@ -100,7 +100,7 @@ rule demux_get_bam:
         BASECALL_DIR + "/{e}/demux_tmp/",
     output:
         maybe_temp(BASECALL_DIR + "/{e}/demux/{kit}_barcode{b}.bam",
-                   DELETE_INTERMEDIATES), 
+                   DELETE_INTERMEDIATES),
     resources:
         mem_mb = 2 * 1024,
         runtime = 60,
@@ -144,8 +144,9 @@ rule get_basecalled_bam_for_sample:
 # basecalled bam file corresponding to the requested sample {s} to fastq.
 rule get_fastq_from_basecalled_bam_for_sample:
     input: bam_from_basecalling
-    output: maybe_temp(SAMPLES_DIR + "/{s}/fastq/reads.fastq.gz",
-                       DELETE_INTERMEDIATES)
+    output:
+        maybe_temp(SAMPLES_DIR + "/{s}/fastq/reads.fastq.gz",
+                   DELETE_INTERMEDIATES)
     resources:
         mem_mb = 6*1024,
         runtime = 4*24*60,
@@ -172,9 +173,9 @@ rule pychopper_trim_orient_reads:
         rescued = maybe_temp("{prefix}.pychop.rescued.fastq.gz",
                              DELETE_INTERMEDIATES),
         unclass = maybe_temp("{prefix}.pychop.unclass.fastq.gz",
-                              DELETE_INTERMEDIATES),
+                             DELETE_INTERMEDIATES),
         trimmed = maybe_temp("{prefix}.pychop.trimmed.fastq.gz",
-                              DELETE_INTERMEDIATES),
+                             DELETE_INTERMEDIATES),
     threads: 8
     resources:
         mem_mb = 20*1024,
