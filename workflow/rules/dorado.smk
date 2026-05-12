@@ -64,6 +64,7 @@ rule basecall:
             > {output}
         """
 
+
 # Rule demux demultiplexes a multiplexed run. The output path will
 # contain multiple bam files in the format [kit]_barcode[barcode].bam (e.g.
 # SQK-RPB004_barcode01.bam).
@@ -128,9 +129,7 @@ def bam_from_basecalling(wilds):
 # into the sample directory.
 rule get_basecalled_bam_for_sample:
     input: bam_from_basecalling
-    output:
-        maybe_temp(SAMPLES_DIR + "/{s}/basecall/calls.bam",
-                   DELETE_INTERMEDIATES)
+    output: SAMPLES_DIR + "/{s}/basecall/calls.bam"
     resources:
         mem_mb = 2 * 1024,
         runtime = 60,
@@ -140,11 +139,13 @@ rule get_basecalled_bam_for_sample:
         ln {input} {output}
         """
 
+
 # Rule get_fastq_from_basecalled_bam_for_sample finds and converts the
 # basecalled bam file corresponding to the requested sample {s} to fastq.
 rule get_fastq_from_basecalled_bam_for_sample:
     input: bam_from_basecalling
-    output: SAMPLES_DIR + "/{s}/fastq/reads.fastq.gz"
+    output: maybe_temp(SAMPLES_DIR + "/{s}/fastq/reads.fastq.gz",
+                       DELETE_INTERMEDIATES)
     resources:
         mem_mb = 6*1024,
         runtime = 4*24*60,
