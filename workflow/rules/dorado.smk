@@ -234,8 +234,7 @@ rule rename_final_stranded_fastq:
     input:
         lambda ws: path_to_stranded_fastq(samples[ws.sample])
     output:
-        maybe_temp(SAMPLES_DIR + "/{sample}/fastq/reads.final.fastq.gz",
-                   DELETE_INTERMEDIATES)
+        SAMPLES_DIR + "/{sample}/fastq/reads.final.fastq.gz"
     threads: 1
     resources:
         mem_mb = 2 * 1024,
