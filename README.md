@@ -40,6 +40,7 @@ DORADO: {
   EXP_DIR: "experiments",
   BASECALL_DIR: "basecall",
   SAMPLES_DIR: "samples",
+  DELETE_INTERMEDIATES: False,
   BIN_VERSION: 'dorado-1.1.1-linux-x64',
   DORADO_RESOURCES: {
     gpu: 2,
@@ -60,7 +61,7 @@ Then in a consuming snakefile:
 ```python
 module dorado_basecall:
     snakefile:
-        github("maragkakislab/wf-module-dorado", path="workflow/Snakefile", tag="v1.0.2")
+        github("maragkakislab/wf-module-dorado", path="workflow/Snakefile", tag="v1.0.3")
     config:
         config["DORADO"]
 
@@ -86,6 +87,7 @@ Important keys found in `config/config.yml` (examples):
 - `BASECALL_DIR` - where per-experiment basecalling outputs are stored.
 - `SAMPLES_DIR` - where per-sample outputs are placed.
 - `BIN_VERSION` - Dorado binary version to use.
+- `DELETE_INTERMEDIATES` - Delete intermediate files if True (Default: False)
 - `DORADO_RESOURCES` - Dorado default GPU resources (Optional)
 - `DEFAULT_MODEL`, `CUSTOM_MODELS` - model selection used in `basecall` rule.
 - `SAMPLE_DATA` - table describing samples; the `workflow/rules/common.smk`
