@@ -41,7 +41,7 @@ rule basecall:
         dorado = DOWNLOADS_DIR + '/' + BIN_VERSION + '/bin/dorado',
         origin = EXP_DIR + "/{e}/" + EXP_DIR_TRIGGER_FILE,
     output:
-        BASECALL_DIR + "/{e}/calls.bam"
+        maybe_temp(BASECALL_DIR + "/{e}/calls.bam", DELETE_INTERMEDIATES),
     params:
         idir = lambda wilds, input: os.path.dirname(input.origin),
         model = lambda wilds: model(experiments[wilds.e]),
@@ -64,6 +64,7 @@ rule basecall:
             > {output}
         """
 
+
 # Rule demux demultiplexes a multiplexed run. The output path will
 # contain multiple bam files in the format [kit]_barcode[barcode].bam (e.g.
 # SQK-RPB004_barcode01.bam).
@@ -72,7 +73,8 @@ rule demux:
         dorado = DOWNLOADS_DIR + '/' + BIN_VERSION + '/bin/dorado',
         calls = BASECALL_DIR + "/{e}/calls.bam"
     output:
-        temp(directory(BASECALL_DIR + "/{e}/demux_tmp/")),
+        maybe_temp(directory(BASECALL_DIR + "/{e}/demux_tmp/"),
+                   DELETE_INTERMEDIATES),
     threads:
         12
     resources:
@@ -97,7 +99,8 @@ rule demux_get_bam:
     input:
         BASECALL_DIR + "/{e}/demux_tmp/",
     output:
-        BASECALL_DIR + "/{e}/demux/{kit}_barcode{b}.bam",
+        maybe_temp(BASECALL_DIR + "/{e}/demux/{kit}_barcode{b}.bam",
+                   DELETE_INTERMEDIATES), 
     resources:
         mem_mb = 2 * 1024,
         runtime = 60,
@@ -141,7 +144,8 @@ rule get_basecalled_bam_for_sample:
 # basecalled bam file corresponding to the requested sample {s} to fastq.
 rule get_fastq_from_basecalled_bam_for_sample:
     input: bam_from_basecalling
-    output: temp(SAMPLES_DIR + "/{s}/fastq/reads.fastq.gz")
+    output: maybe_temp(SAMPLES_DIR + "/{s}/fastq/reads.fastq.gz",
+                       DELETE_INTERMEDIATES)
     resources:
         mem_mb = 6*1024,
         runtime = 4*24*60,
@@ -165,9 +169,12 @@ rule pychopper_trim_orient_reads:
     output:
         stats_output = "{prefix}.pychop.stats.tsv",
         report = "{prefix}.pychop.report.pdf",
-        rescued = "{prefix}.pychop.rescued.fastq.gz",
-        unclass = "{prefix}.pychop.unclass.fastq.gz",
-        trimmed = "{prefix}.pychop.trimmed.fastq.gz",
+        rescued = maybe_temp("{prefix}.pychop.rescued.fastq.gz",
+                             DELETE_INTERMEDIATES),
+        unclass = maybe_temp("{prefix}.pychop.unclass.fastq.gz",
+                              DELETE_INTERMEDIATES),
+        trimmed = maybe_temp("{prefix}.pychop.trimmed.fastq.gz",
+                              DELETE_INTERMEDIATES),
     threads: 8
     resources:
         mem_mb = 20*1024,
@@ -197,7 +204,7 @@ rule pychopper_merge_trimmed_rescued:
         rescued = "{prefix}.pychop.rescued.fastq.gz",
         trimmed = "{prefix}.pychop.trimmed.fastq.gz",
     output:
-        "{prefix}.pychopped.fastq.gz"
+        maybe_temp("{prefix}.pychopped.fastq.gz", DELETE_INTERMEDIATES)
     threads: 2
     resources:
         mem_mb = 2*1024,
@@ -228,10 +235,11 @@ rule rename_final_stranded_fastq:
         lambda ws: path_to_stranded_fastq(samples[ws.sample])
     output:
         SAMPLES_DIR + "/{sample}/fastq/reads.final.fastq.gz"
+    threads: 1
     resources:
         mem_mb = 2 * 1024,
         runtime = 60,
     shell:
         """
-        mv {input} {output}
+        ln {input} {output}
         """

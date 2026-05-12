@@ -20,7 +20,7 @@ DEFAULT_MODEL = config['DEFAULT_MODEL']
 CUSTOM_MODELS = config.get('CUSTOM_MODELS', {})
 SAMPLE_DATA = config['SAMPLE_DATA']
 DORADO_RESOURCES = config.get('DORADO_RESOURCES', {})
-
+DELETE_INTERMEDIATES = config.get('DELETE_INTERMEDIATES', False)
 
 ##### include rules #####
 include: "rules/common.smk"
