@@ -52,7 +52,7 @@ rule basecall:
         gpu = DORADO_RESOURCES.get("gpu", 1),
         gpu_model = DORADO_RESOURCES.get("gpu_model", "gpua100"),
         mem_mb = 64*1024,
-        runtime = 8*24*60,
+        runtime = DORADO_RESOURCES.get("basecall_runtime", 1100),
     shell:
         """
         {input.dorado} basecaller \
