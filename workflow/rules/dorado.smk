@@ -79,7 +79,7 @@ rule demux:
         12
     resources:
         mem_mb = 64*1024,
-        runtime = 4*24*60,
+        runtime = CPU_RULE_RESOURCES.get("demux_runtime", 480),
     shell:
         """
         {input.dorado} demux \
@@ -149,7 +149,7 @@ rule get_fastq_from_basecalled_bam_for_sample:
                    DELETE_INTERMEDIATES)
     resources:
         mem_mb = 6*1024,
-        runtime = 4*24*60,
+        runtime = CPU_RULE_RESOURCES.get("fastq_from_bam_runtime", 480),
     threads: 10
     conda:
         "../envs/samtools.yml"
@@ -179,7 +179,7 @@ rule pychopper_trim_orient_reads:
     threads: 8
     resources:
         mem_mb = 20*1024,
-        runtime = 3*24*60,
+        runtime = CPU_RULE_RESOURCES.get("pychopper_trim_runtime", 480),
         disk_mb = 20*1024,
     conda:
         "../envs/dorado.yml"

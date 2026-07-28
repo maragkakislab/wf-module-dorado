@@ -28,8 +28,14 @@ DELETE_INTERMEDIATES: False
 DORADO_RESOURCES:
     gpu: 2
     gpu_model: "[gpua100|gpuv100x]"
-    basecall_runtime: 1100  # total runtime in seconds 
-    
+    basecall_runtime: 1100  # total runtime in minutes 
+
+CPU_RULE_RESOURCES:
+    demux_runtime: 480
+    fastq_from_bam_runtime: 480
+    pychopper_trim_runtime: 480
+
+
 # Mapping to specify custom models for experiment
 # e.g. 'sup', 'm5C_2OmeC', 'inosine_m6A_2OmeA', 'pseU_2OmeU', '2OmeG'
 CUSTOM_MODELS : {
