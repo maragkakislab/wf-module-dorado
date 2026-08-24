@@ -106,7 +106,7 @@ rule demux_get_bam:
         runtime = 60,
     shell:
         """
-        mv {input}/*_{wildcards.kit}_barcode{wildcards.b}.bam {output}
+        samtools merge {output} {input}/*_{wildcards.kit}_barcode{wildcards.b}.bam
         """
 
 
