@@ -104,6 +104,8 @@ rule demux_get_bam:
     resources:
         mem_mb = 2 * 1024,
         runtime = 60,
+    conda:
+        "../envs/samtools.yml"
     shell:
         """
         samtools merge {output} {input}/*_{wildcards.kit}_barcode{wildcards.b}.bam
