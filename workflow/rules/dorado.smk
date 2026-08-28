@@ -110,7 +110,7 @@ rule demux_get_bam:
         """
         samtools merge {output} {input}/*_{wildcards.kit}_barcode{wildcards.b}.bam
         """
-
+        
 
 # bam_from_basecalling identifies and returns the path to the
 # basecalled data for a sample. For barcoded samples the path contains two
