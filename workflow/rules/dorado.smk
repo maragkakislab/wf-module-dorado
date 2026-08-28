@@ -104,11 +104,13 @@ rule demux_get_bam:
     resources:
         mem_mb = 2 * 1024,
         runtime = 60,
+    conda:
+        "../envs/samtools.yml"
     shell:
         """
-        mv {input}/*_{wildcards.kit}_barcode{wildcards.b}.bam {output}
+        samtools merge {output} {input}/*_{wildcards.kit}_barcode{wildcards.b}.bam
         """
-
+        
 
 # bam_from_basecalling identifies and returns the path to the
 # basecalled data for a sample. For barcoded samples the path contains two
